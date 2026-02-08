@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adli Para Cezası Hesaplama</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #718096;
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 400;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 32px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h2 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #cbd5e0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 18px;
+            color: #667eea;
+            padding-top: 16px;
+            margin-top: 8px;
+            border-top: 2px solid #cbd5e0;
+        }
+
+        .result-label {
+            color: #4a5568;
+        }
+
+        .result-value {
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #edf2f7;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Adli Para Cezası Hesaplama</h1>
+        <p class="subtitle">CMK 171. Madde Kapsamında Ödeme Tutarı Hesaplayıcı</p>
+
+        <div class="info-box">
+            <strong>Not:</strong> Bu hesaplama aracı, uzlaşma kapsamındaki suçlar hariç olmak üzere,
+            yalnız adli para cezasını gerektiren veya hapis cezasının yukarı sınırı 6 ayı aşmayan
+            suçlar için ödenecek tutarı hesaplar.
+        </div>
+
+        <form id="calculatorForm">
+            <div class="form-group">
+                <label for="cezaTuru">Ceza Türü</label>
+                <select id="cezaTuru" required>
+                    <option value="">Seçiniz...</option>
+                    <option value="adli">Sadece Adli Para Cezası</option>
+                    <option value="hapis">Sadece Hapis Cezası</option>
+                    <option value="her-ikisi">Hapis + Adli Para Cezası</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tarihTuru">Suç Tarihi Dönemi</label>
+                <select id="tarihTuru" required>
+                    <option value="">Seçiniz...</option>
+                    <option value="2024-06-01">01.06.2024 ve Sonrası (100 TL/gün)</option>
+                    <option value="2016-12-02">02.12.2016 - 01.06.2024 (30 TL/gün)</option>
+                    <option value="2016-12-01">02.12.2016 Öncesi (20 TL/gün)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="adliParaCezasiGroup" style="display: none;">
+                <label for="adliParaCezasi">Adli Para Cezası</label>
+                <input type="number" id="adliParaCezasi" min="0" step="0.01" placeholder="TL">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="maktuCeza">
+                    <label for="maktuCeza">Maktu (Sabit) Tutar</label>
+                </div>
+            </div>
+
+            <div class="form-group" id="hapisCezasiGroup" style="display: none;">
+                <label for="hapisCezasiAy">Hapis Cezası Alt Sınırı (Ay)</label>
+                <input type="number" id="hapisCezasiAy" min="0" max="11" placeholder="Ay">
+            </div>
+
+            <div class="form-group" id="hapisCezasiGunGroup" style="display: none;">
+                <label for="hapisCezasiGun">Hapis Cezası Alt Sınırı (Gün)</label>
+                <input type="number" id="hapisCezasiGun" min="0" max="30" placeholder="Gün">
+            </div>
+
+            <div class="form-group">
+                <label for="sorusturmaGideri">Soruşturma Giderleri</label>
+                <input type="number" id="sorusturmaGideri" min="0" step="0.01" value="0" placeholder="TL">
+            </div>
+
+            <button type="submit">Hesapla</button>
+        </form>
+
+        <div class="result" id="result">
+            <h2>Hesaplama Sonucu</h2>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('calculatorForm');
+        const cezaTuru = document.getElementById('cezaTuru');
+        const tarihTuru = document.getElementById('tarihTuru');
+        const adliParaCezasiGroup = document.getElementById('adliParaCezasiGroup');
+        const hapisCezasiGroup = document.getElementById('hapisCezasiGroup');
+        const hapisCezasiGunGroup = document.getElementById('hapisCezasiGunGroup');
+        const result = document.getElementById('result');
+        const resultContent = document.getElementById('resultContent');
+
+        cezaTuru.addEventListener('change', function() {
+            const value = this.value;
+
+            adliParaCezasiGroup.style.display = 'none';
+            hapisCezasiGroup.style.display = 'none';
+            hapisCezasiGunGroup.style.display = 'none';
+
+            if (value === 'adli' || value === 'her-ikisi') {
+                adliParaCezasiGroup.style.display = 'block';
+            }
+
+            if (value === 'hapis' || value === 'her-ikisi') {
+                hapisCezasiGroup.style.display = 'block';
+                hapisCezasiGunGroup.style.display = 'block';
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hesapla();
+        });
+
+        function getGunlukUcret(tarihStr) {
+            const tarihObj = new Date(tarihStr);
+            const haziran2024 = new Date('2024-06-01');
+            const aralik2016 = new Date('2016-12-02');
+
+            if (tarihObj >= haziran2024) {
+                return 100;
+            } else if (tarihObj >= aralik2016) {
+                return 30;
+            } else {
+                return 20;
+            }
+        }
+
+        function getAdliParaAltSinir(tarihStr) {
+            const tarihObj = new Date(tarihStr);
+            const haziran2024 = new Date('2024-06-01');
+
+            if (tarihObj >= haziran2024) {
+                return 100;
+            } else {
+                return 20;
+            }
+        }
+
+        function hesapla() {
+            const cezaTuruValue = cezaTuru.value;
+            const tarihValue = tarihTuru.value;
+            const sorusturmaGideri = parseFloat(document.getElementById('sorusturmaGideri').value) || 0;
+
+            let adliParaTutari = 0;
+            let hapisCezasiTutari = 0;
+            let detaylar = [];
+
+            const gunlukUcret = getGunlukUcret(tarihValue);
+            const adliParaAltSinir = getAdliParaAltSinir(tarihValue);
+
+            if (cezaTuruValue === 'adli' || cezaTuruValue === 'her-ikisi') {
+                const adliParaCezasi = parseFloat(document.getElementById('adliParaCezasi').value) || 0;
+                const maktuCeza = document.getElementById('maktuCeza').checked;
+
+                if (maktuCeza) {
+                    adliParaTutari = adliParaCezasi;
+                    detaylar.push({
+                        label: 'Adli Para Cezası (Maktu)',
+                        value: adliParaCezasi.toFixed(2) + ' TL'
+                    });
+                } else {
+                    adliParaTutari = Math.max(adliParaCezasi, adliParaAltSinir);
+                    detaylar.push({
+                        label: 'Adli Para Cezası (Alt Sınır)',
+                        value: adliParaTutari.toFixed(2) + ' TL'
+                    });
+                }
+            }
+
+            if (cezaTuruValue === 'hapis' || cezaTuruValue === 'her-ikisi') {
+                const hapisCezasiAy = parseInt(document.getElementById('hapisCezasiAy').value) || 0;
+                const hapisCezasiGun = parseInt(document.getElementById('hapisCezasiGun').value) || 0;
+
+                const toplamGun = (hapisCezasiAy * 30) + hapisCezasiGun;
+                hapisCezasiTutari = toplamGun * gunlukUcret;
+
+                detaylar.push({
+                    label: `Hapis Cezası (${hapisCezasiAy} ay ${hapisCezasiGun} gün)`,
+                    value: hapisCezasiTutari.toFixed(2) + ' TL'
+                });
+                detaylar.push({
+                    label: 'Günlük Ücret',
+                    value: gunlukUcret + ' TL'
+                });
+            }
+
+            if (sorusturmaGideri > 0) {
+                detaylar.push({
+                    label: 'Soruşturma Giderleri',
+                    value: sorusturmaGideri.toFixed(2) + ' TL'
+                });
+            }
+
+            const toplamTutar = adliParaTutari + hapisCezasiTutari + sorusturmaGideri;
+
+            let html = '';
+            detaylar.forEach(detay => {
+                html += `
+                    <div class="result-item">
+                        <span class="result-label">${detay.label}</span>
+                        <span class="result-value">${detay.value}</span>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="result-item">
+                    <span class="result-label">TOPLAM ÖDENECEK TUTAR</span>
+                    <span class="result-value">${toplamTutar.toFixed(2)} TL</span>
+                </div>
+            `;
+
+            resultContent.innerHTML = html;
+            result.classList.add('show');
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
